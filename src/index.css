@@ -238,3 +238,36 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   from { opacity: 1; transform: translate(-50%, 0); }
   to { opacity: 0; transform: translate(-50%, 20px); }
 }
+
+/* ========== MOBILE RESPONSIVENESS ========== */
+@media (max-width: 768px) {
+  .section {
+    padding: 5rem 0;
+  }
+  
+  .container {
+    padding: 0 1.5rem;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
+
+  .mobile-flex-col {
+    flex-direction: column !important;
+  }
+
+  .mobile-grid-1 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
+}

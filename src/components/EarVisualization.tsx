@@ -223,7 +223,7 @@ export const EarVisualization = () => {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'center' }}>
+        <div className="mobile-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'center' }}>
           {/* 3D Ear Canvas */}
           <div className="ear-canvas-wrap glass" style={{
             height: '500px', borderRadius: '24px', overflow: 'hidden', position: 'relative'
@@ -232,11 +232,12 @@ export const EarVisualization = () => {
           </div>
 
           {/* Song Structure Data Table */}
-          <div>
+          <div style={{ minWidth: 0, width: '100%' }}>
             <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--white-90)' }}>
               Song Structure Analysis
             </h3>
-            <div className="glass" style={{ overflow: 'hidden' }}>
+            <div className="glass" style={{ overflowX: 'auto', overflowY: 'hidden', width: '100%' }}>
+              <div style={{ minWidth: '500px' }}>
               <div style={{
                 display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr',
                 padding: '1rem 1.5rem', fontWeight: 700, fontSize: '0.8rem',
@@ -259,6 +260,7 @@ export const EarVisualization = () => {
                   <div>{row.key}</div>
                 </div>
               ))}
+              </div>
             </div>
           </div>
         </div>

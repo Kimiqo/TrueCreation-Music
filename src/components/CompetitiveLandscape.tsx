@@ -57,7 +57,8 @@ export const CompetitiveLandscape = () => {
           </p>
         </div>
 
-        <div ref={tableRef} className="glass" style={{ overflow: 'hidden' }}>
+        <div ref={tableRef} className="glass" style={{ overflowX: 'auto', overflowY: 'hidden', width: '100%' }}>
+          <div style={{ minWidth: '600px' }}>
           <div style={{
             display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
             padding: '1.8rem 2.5rem',
@@ -88,6 +89,7 @@ export const CompetitiveLandscape = () => {
               <div style={{ color: comp.isHighlight ? 'var(--orange)' : 'var(--white-70)' }}>{comp.limitation}</div>
             </div>
           ))}
+          </div>
         </div>
       </div>
     </section>

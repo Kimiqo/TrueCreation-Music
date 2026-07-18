@@ -96,7 +96,7 @@ export const FeatureShowcase = () => {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5rem' }}>
           {features.map((f, i) => (
-            <div key={i} ref={el => { rowsRef.current[i] = el; }} style={{
+            <div key={i} ref={el => { rowsRef.current[i] = el; }} className="mobile-flex-col" style={{
               display: 'flex', flexDirection: i % 2 === 0 ? 'row' : 'row-reverse',
               alignItems: 'center', gap: '4rem',
             }}>

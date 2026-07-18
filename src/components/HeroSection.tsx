@@ -172,9 +172,9 @@ export const HeroSection = () => {
                 Empowering creators to decode the DNA of digital music. Understand what makes every track unique.
               </p>
 
-              <div className="hero-btns" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', opacity: 0 }}>
-                <button onClick={triggerComingSoon} className="btn-primary" style={{ padding: '1.1rem 2.8rem', fontSize: '1.1rem' }}>Enter TrueCreation</button>
-                <button onClick={triggerComingSoon} className="btn-ghost" style={{ padding: '1.1rem 2.8rem', fontSize: '1.1rem' }}>Watch Demo</button>
+              <div className="hero-btns mobile-flex-col" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', opacity: 0 }}>
+                <button onClick={triggerComingSoon} className="btn-primary" style={{ padding: 'clamp(0.8rem, 2vw, 1.1rem) clamp(1.5rem, 4vw, 2.8rem)', fontSize: 'clamp(0.95rem, 2vw, 1.1rem)' }}>Enter TrueCreation</button>
+                <button onClick={triggerComingSoon} className="btn-ghost" style={{ padding: 'clamp(0.8rem, 2vw, 1.1rem) clamp(1.5rem, 4vw, 2.8rem)', fontSize: 'clamp(0.95rem, 2vw, 1.1rem)' }}>Watch Demo</button>
               </div>
             </div>
           </div>
@@ -204,7 +204,7 @@ export const HeroSection = () => {
                   Producers waste time, money, and creative energy trying to decode the sounds they hear.
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', textAlign: 'left' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', textAlign: 'left' }}>
                   {problems.map((item, i) => (
                     <div key={i} className="glass prob-card" style={{
                       padding: '2rem 1.5rem', cursor: 'default', opacity: 0, transform: 'translateY(40px)'

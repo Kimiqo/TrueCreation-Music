@@ -65,10 +65,10 @@ export const CallToAction = () => {
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'center', marginBottom: '2.5rem' }}>
-            <a href="#" onClick={triggerComingSoon} className="btn-primary cta-glow-ring" style={{ padding: '1.2rem 3rem', fontSize: '1.2rem' }}>
+            <a href="#" onClick={triggerComingSoon} className="btn-primary cta-glow-ring" style={{ padding: 'clamp(1rem, 3vw, 1.2rem) clamp(2rem, 5vw, 3rem)', fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>
               Get Started
             </a>
-            <a href="mailto:gilbertakwetteh@gmail.com" className="btn-ghost" style={{ padding: '1.2rem 3rem', fontSize: '1.2rem' }}>
+            <a href="mailto:gilbertakwetteh@gmail.com" className="btn-ghost" style={{ padding: 'clamp(1rem, 3vw, 1.2rem) clamp(2rem, 5vw, 3rem)', fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>
               Contact Us
             </a>
           </div>
