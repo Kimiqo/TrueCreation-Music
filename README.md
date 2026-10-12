@@ -20,4 +20,4 @@ The website uses React, TypeScript, Vite, GSAP and a lazy-loaded Three.js scene.
 
 `public/concept.mp4` is the approved concept video. Private app recordings and captures in `public/local-preview/` are ignored by Git and excluded from production builds. Local demo dialogs use those review assets only in development; production shows a private-walkthrough availability message.
 
-`public/investor-overview.md` is the intentional downloadable product overview. Internal handover documents, local environments, caches, credentials and model weights are excluded.
+Internal handover documents, local environments, caches, credentials and model weights are excluded.
