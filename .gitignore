@@ -22,3 +22,70 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Private app captures and recordings: local review only
+public/local-preview/
+REVAMP.md
+
+# Local Python installations and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+playwright-report/
+test-results/
+
+# Local configuration, credentials, and databases
+.env
+.env.*
+!.env.example
+.vibe-wise/
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+*.db-wal
+*.db-shm
+
+# Private audio, recordings, and model weights
+*.wav
+*.mp3
+*.flac
+*.m4a
+*.aac
+*.ogg
+*.opus
+*.aif
+*.aiff
+*.mp4
+*.webm
+*.mov
+*.m4v
+*.mkv
+*.avi
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.safetensors
+
+# Local generated artifacts
+/tmp/
+/output/
+/recordings/
+/screenshots/
+/demo-artifacts/
+
+# Approved website concept video
+!/public/concept.mp4

@@ -1,19 +1,73 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Layout } from './components/Layout';
-import { LandingPage } from './pages/LandingPage';
-import { FeaturesPage } from './pages/FeaturesPage';
-
-function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<LandingPage />} />
-          <Route path="features" element={<FeaturesPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, ArrowDown, Play, X, Menu, AudioLines, Layers3, ScanLine, SlidersHorizontal, Download, Check, Plus, Minus } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import './App.css';
+const SoundSculpture = lazy(() => import('./components/SoundSculpture'));
+gsap.registerPlugin(ScrollTrigger);
+const stems = ['Vocals', 'Drums', 'Bass', 'Guitar', 'Piano', 'Other'];
+const steps = [
+  { title: 'Bring your curiosity.', label: 'Upload', copy: 'Start with a WAV or MP3. Your track becomes a workspace for deeper listening.', detail: 'Current MVP · up to 3 minutes / 75 MB', icon: AudioLines },
+  { title: 'Hear the hidden layers.', label: 'Listen', copy: 'Six stems. One shared timeline. Solo a vocal, follow the bass, or listen inside the rhythm.', detail: 'Mute, solo, volume & optional drum components', icon: Layers3 },
+  { title: 'Find the musical thread.', label: 'Analyse', copy: 'Explore estimated chords, tempo and key. Change speed and pitch while keeping your place.', detail: 'Live tempo 50–150% · transpose ±12 semitones', icon: SlidersHorizontal },
+  { title: 'Follow that one moment.', label: 'Investigate', copy: 'Select a passage, measure its sound characteristics and save your investigation. Take the stems back to your creative process.', detail: 'Passage measurements · saved results · stem exports', icon: ScanLine },
+];
+function Waveform({ seed = 0 }: { seed?: number }) {
+  return <svg viewBox="0 0 560 52" preserveAspectRatio="none" aria-hidden="true">{Array.from({ length: 140 }, (_, i) => { const h = 4 + Math.abs(Math.sin(i * 1.73 + seed) * Math.cos(i * .17 + seed)) * 44; return <rect key={i} x={i * 4} y={(52 - h) / 2} width="2" height={h} rx="1" />; })}</svg>;
 }
-
+function Workspace({ step }: { step: number }) {
+  const [solo, setSolo] = useState<string | null>(null);
+  const [tempo, setTempo] = useState(100);
+  const [tab, setTab] = useState(step >= 2 ? 'Analyse' : 'Listen');
+  return <div className="workspace">
+    <div className="window-bar"><span className="window-dots">● ● ●</span><span>TRUECREATION / WORKSPACE</span><span className="prototype-tag">INTERACTIVE PREVIEW</span></div>
+    <div className="workspace-heading"><div><span className="eyebrow">LISTEN CLOSER. UNDERSTAND MORE.</span><h3>Your next discovery.</h3></div><AudioLines size={27} /></div>
+    <div className="workspace-tabs">{['Listen', 'Analyse'].map(t => <button key={t} onClick={() => setTab(t)} className={tab === t ? 'active' : ''}>{t}</button>)}<span>6 stems / ready</span></div>
+    {tab === 'Listen' ? <><div className="track-overview"><div className="tiny-label">TRACK OVERVIEW <span>ILLUSTRATIVE WAVEFORMS</span></div><Waveform seed={3} /><div className="transport"><AudioLines size={17} /><div className="transport-line" /><span>01:35</span></div></div><div className="mixer">{stems.map((stem, i) => <div key={stem} className={`stem-row ${solo && solo !== stem ? 'muted' : ''}`} style={{ '--stem-color': ['#e6aa7e','#d6c383','#b5a0de','#98b49c','#93b9d2','#c2c3c4'][i] } as React.CSSProperties}><span className="stem-name">{stem}</span><button aria-label={`Solo ${stem}`} aria-pressed={solo === stem} onClick={() => setSolo(solo === stem ? null : stem)} className={solo === stem ? 'selected' : ''}>S</button><Waveform seed={i + 1} /></div>)}</div></> : <div className="analysis-preview"><span className="tiny-label">EXPLORE THE MUSICAL STRUCTURE</span><div className="chords">{['C', 'Am', 'F', 'G'].map((c,i) => <div key={c}><span>00:{String(i * 8).padStart(2,'0')}</span><strong>{c}</strong></div>)}</div><p>Illustrative chord estimates. Actual results depend on the track.</p><div className="tempo-control"><span>Tempo</span><button aria-label="Decrease preview tempo" disabled={tempo === 50} onClick={() => setTempo(Math.max(50, tempo - 5))}><Minus size={16}/></button><strong>{tempo}%</strong><button aria-label="Increase preview tempo" disabled={tempo === 150} onClick={() => setTempo(Math.min(150, tempo + 5))}><Plus size={16}/></button></div><div className="passage"><ScanLine size={20}/><div><strong>Investigate a moment</strong><p>Select a passage. Explore its signature.</p></div></div></div>}
+    <div className="workspace-bottom"><span><i />{steps[step].label.toUpperCase()} / THE CREATIVE WORKFLOW</span><span>No audio in this preview</span></div>
+  </div>;
+}
+function App() {
+  const root = useRef<HTMLDivElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [menu, setMenu] = useState(false);
+  const [step, setStep] = useState(1);
+  const [reduced, setReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [modal, setModal] = useState<'demo' | 'screens' | null>(null);
+  const [screen, setScreen] = useState('listen');
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const change = () => setReduced(media.matches);
+    media.addEventListener('change', change);
+    return () => media.removeEventListener('change', change);
+  }, []);
+  useEffect(() => {
+    if (reduced) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo('.hero-copy > *', { y: 28, opacity: 0 }, { y: 0, opacity: 1, stagger: .1, duration: 1, ease: 'power3.out' });
+      gsap.to('.sculpture-stage', { y: 120, scale: 1.25, scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 } });
+      gsap.utils.toArray<HTMLElement>('.reveal').forEach(el => gsap.fromTo(el, { y: 45, opacity: .25 }, { y: 0, opacity: 1, duration: .8, scrollTrigger: { trigger: el, start: 'top 92%' } }));
+      gsap.fromTo('.workspace-frame', { rotateX: 8, scale: .91 }, { rotateX: 0, scale: 1, scrollTrigger: { trigger: '.journey', start: 'top 85%', end: 'top 25%', scrub: 1 } });
+    }, root);
+    return () => ctx.revert();
+  }, [reduced]);
+  useEffect(() => {
+    if (modal) dialog.current?.showModal();
+    else dialog.current?.close();
+  }, [modal]);
+  const close = () => setModal(null);
+  return <div ref={root} className={reduced ? 'reduced-motion' : undefined}>
+    <a className="skip-link" href="#main">Skip to content</a>
+    <header className="site-header"><a href="#" className="brand" aria-label="TrueCreation home"><img src="/logo.png" alt="" /><span>TrueCreation<span className="brand-period">.</span></span></a><nav aria-label="Main navigation" className={menu ? 'open' : ''}>{[['The experience','#experience'],['Our vision','#vision'],['For investors','#investors']].map(([text,href]) => <a key={href} href={href} onClick={() => setMenu(false)}>{text}</a>)}</nav><a className="nav-cta" href="#experience">Explore the MVP <ArrowUpRight size={16}/></a><button className="menu-toggle" aria-label={menu ? 'Close menu' : 'Open menu'} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button></header>
+    <main id="main"><section className="hero"><div className="hero-grid" aria-hidden="true"/><div className="sculpture-stage"><div className="sculpture-fallback"/>{!reduced && <Suspense fallback={null}><SoundSculpture/></Suspense>}<span className="orbit-label orbit-one"><i/> SOUND, UNFOLDED</span><span className="orbit-label orbit-two">FROM LISTENING<br/>TO UNDERSTANDING</span></div><div className="hero-copy"><div className="eyebrow"><span className="live-dot"/> A NEW WAY TO EXPLORE MUSIC</div><h1>Every sound<br/>has a <em>story.</em></h1><p>Go beyond the finished track.<br/>Uncover its layers. Explore its moments.<br/>Turn curiosity into your next creation.</p><div className="hero-actions"><a className="button primary" href="#experience">Discover TrueCreation <ArrowUpRight size={18}/></a><button className="text-button" onClick={() => setModal('demo')}><span className="play-circle"><Play size={12} fill="currentColor"/></span>Watch the real MVP</button></div><div className="hero-note">BUILT FOR THE CURIOUS. MADE FOR THE CREATIVE.</div></div><div className="hero-bottom"><span>LISTEN CLOSER. UNDERSTAND MORE.</span><a href="#manifesto">SCROLL TO DISCOVER <ArrowDown size={14}/></a><span>01 — THE POSSIBILITY</span></div></section>
+    <section id="manifesto" className="manifesto section-shell"><span className="eyebrow reveal">CURIOSITY IS THE BEGINNING</span><h2 className="reveal">You hear a track.<br/>We see a world<br/><span>waiting to be explored.</span></h2><div className="manifesto-bottom reveal"><span className="small-orbit" aria-hidden="true">✳</span><p>That bassline. That texture. That unexpected chord.<br/>TrueCreation gives producers, artists and music lovers a workspace to look deeper — and a new starting point for their own ideas.</p></div></section>
+    <section id="experience" className="journey section-shell"><div className="section-top reveal"><span className="eyebrow">02 / THE EXPERIENCE</span><span className="section-meta">ONE TRACK. A NEW PERSPECTIVE.</span></div><div className="journey-heading reveal"><h2>From a whole track.<br/>To a <em>whole new idea.</em></h2><p>A familiar music workspace.<br/>An unfamiliar depth of discovery.</p></div><div className="journey-grid"><div className="step-list">{steps.map((s,i) => <button key={s.label} className={`journey-step ${step === i ? 'active' : ''}`} onClick={() => setStep(i)} aria-expanded={step === i}><div className="step-top"><span>0{i+1}</span><s.icon size={18}/><span>{s.label}</span><ArrowUpRight size={17}/></div><h3>{s.title}</h3>{step === i && <div className="step-body"><p>{s.copy}</p><small>{s.detail}</small></div>}</button>)}</div><div className="workspace-frame"><Workspace key={step} step={step}/><div className="preview-caption"><span><i/> Explore the interface concept above</span><button onClick={() => setModal('screens')}>See actual app screens <ArrowUpRight size={14}/></button></div></div></div></section>
+    <section className="capabilities section-shell"><div className="capability reveal"><Layers3/><strong>6 main stems.</strong><p>A different way into the mix.</p></div><div className="capability reveal"><SlidersHorizontal/><strong>Your pace. Your pitch.</strong><p>Live adjustments for deeper listening.</p></div><div className="capability reveal"><ScanLine/><strong>One moment. More insight.</strong><p>Passage analysis you can save.</p></div><div className="capability reveal"><Download/><strong>Ideas that travel.</strong><p>Original and transformed stem exports.</p></div><p className="capability-note">Musical analysis is estimated. Piano and guitar separation is experimental; leakage can occur. Optional drum separation is under local evaluation.</p></section>
+    <section id="vision" className="vision section-shell"><div className="vision-art" aria-hidden="true">{Array.from({length: 13},(_,i) => <div key={i} style={{'--i': i} as React.CSSProperties}/>)}</div><div className="vision-copy reveal"><span className="eyebrow">03 / THE BIGGER VISION</span><h2>Understanding sound.<br/><em>Unlocking possibility.</em></h2><p>We believe deeper listening can open up creative opportunity. Our ambition is to connect sound exploration with reference comparisons, transparent evidence and the discovery of new creative ingredients.</p><div className="future-note"><span>THE NEXT CHAPTER / IN DEVELOPMENT</span><p>A permissioned reference catalog and source-comparison tools. Catalog matching and original sample identification are not available in the current MVP.</p></div></div></section>
+    <section id="investors" className="investors section-shell"><div className="section-top reveal"><span className="eyebrow">04 / THE INVESTMENT THESIS</span><span className="section-meta">A WORKING FOUNDATION. AN AMBITIOUS DIRECTION.</span></div><div className="investor-heading reveal"><h2>Beyond separation.<br/><span>A workspace for discovery.</span></h2><p>Stem separation is the entry point. The opportunity is the journey that follows: listening, understanding and investigating sound in one connected workflow.</p></div><div className="investor-grid"><article className="reveal"><span className="status-label"><i/> BUILT TODAY</span><h3>A working local MVP.</h3><p>Real audio uploads, six-stem playback, live tempo and pitch, chord estimates, saved passage analysis and exports.</p><ul><li><Check size={14}/> End-to-end audio workflow</li><li><Check size={14}/> Recorded working product demo</li><li><Check size={14}/> Browser-based creative workspace</li></ul></article><article className="reveal"><span className="status-label amber">NEXT MILESTONE</span><h3>A secure hosted pilot.</h3><p>Bring the workflow to invited creators, with authentication, private storage, bounded processing and operational monitoring.</p><span className="card-foot">Validate demand, quality and processing economics.</span></article><article className="reveal"><span className="status-label muted-label">LONGER-TERM DIRECTION</span><h3>Evidence-led discovery.</h3><p>Develop a permissioned reference catalog, test source comparisons, and make the evidence behind possible matches understandable.</p><span className="card-foot">Catalog access and matching require validation.</span></article></div><div className="investor-proof reveal"><p><strong>Built to earn trust.</strong> The MVP is currently local and single-user. Hosted access, commercial model licensing and reference matching remain milestones. No traction or financial projections are claimed here.</p><a href="/investor-overview.md" download className="text-button">Download MVP overview <Download size={16}/></a></div></section>
+    <section className="closing section-shell"><span className="eyebrow reveal">FOR EVERY “HOW DID THEY MAKE THAT?”</span><h2 className="reveal">Stay curious.<br/><em>Create something true.</em></h2><div className="closing-actions reveal"><button className="button primary" onClick={() => setModal('demo')}>See the working MVP <Play size={15}/></button><a className="button secondary" href="#investors">Explore the vision <ArrowUpRight size={18}/></a></div><p className="closing-note">Local MVP demonstration. Public access is the next chapter.</p></section></main>
+    <footer className="site-footer"><a className="brand" href="#"><img src="/logo.png" alt=""/><span>TrueCreation.</span></a><span>Listen closer. Understand more.</span><span>© 2026 TrueCreation</span><button onClick={() => setReduced(!reduced)} aria-pressed={reduced}>Motion: {reduced ? 'reduced' : 'on'}</button></footer>
+    <dialog aria-labelledby="preview-title" ref={dialog} onCancel={close} onClose={close} onClick={e => {if(e.target === e.currentTarget) close();}}><div className="modal-head"><div><span className="eyebrow">THE ACTUAL PRODUCT / LOCAL PREVIEW</span><h3 id="preview-title">{modal === 'demo' ? 'TrueCreation, in action.' : 'Inside the workspace.'}</h3></div><button onClick={close} aria-label="Close preview"><X/></button></div>{!import.meta.env.DEV ? <div className="demo-availability"><AudioLines size={36}/><h3>A closer look, in a private walkthrough.</h3><p>The working MVP and its recorded demonstration are currently available for private review. Public product access is in development.</p><a className="button primary" href="/investor-overview.md" download>Download the MVP overview <Download size={16}/></a></div> : modal === 'demo' ? <><video controls playsInline preload="metadata" src={modal ? '/local-preview/walkthrough.mp4' : undefined}/><p>Recorded working MVP. Separation was prepared before recording. This private recording and its source music are for local review only.</p></> : <><div className="screen-tabs">{['listen','analyse'].map(s => <button key={s} className={s === screen ? 'active' : ''} onClick={() => setScreen(s)}>{s}</button>)}</div><div className="actual-screen"><img src={`/local-preview/${screen}.png`} alt={`Actual TrueCreation ${screen} view with stem waveforms and music controls`}/></div><p>Actual local app capture. These review assets are excluded from Git and production builds.</p></>}</dialog>
+  </div>;
+}
 export default App;
